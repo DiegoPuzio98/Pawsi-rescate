@@ -31,6 +31,11 @@ export default function Veterinarians() {
   const [page, setPage] = useState(0);
   const pageSize = 9;
 
+  // 🔹 SCROLL TO TOP al montar y al cambiar página
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [page]);
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (user) {
@@ -114,6 +119,7 @@ export default function Veterinarians() {
                       src={vet.images[0]}
                       alt={vet.name}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                   </div>
                 )}
@@ -161,4 +167,5 @@ export default function Veterinarians() {
     </div>
   );
 }
+
 

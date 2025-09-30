@@ -49,6 +49,11 @@ export default function Marketplace() {
     { value: "other", label: "Otros" },
   ];
 
+  // 🔹 SCROLL TO TOP al montar
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (user) {
@@ -162,6 +167,7 @@ export default function Marketplace() {
                       src={classified.thumbnail || classified.images[0]}
                       alt={classified.title}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                   </div>
                 )}
@@ -232,5 +238,6 @@ export default function Marketplace() {
     </div>
   );
 }
+
 
 

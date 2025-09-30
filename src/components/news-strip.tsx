@@ -146,13 +146,63 @@ export const NewsStrip = () => {
 
   const displayedPosts = posts.length > 1 ? [...posts, ...posts] : posts;
 
+  const handleManualScroll = (direction: 'left' | 'right') => {
+    if (!scrollRef.current) return;
+
+    setIsManualScrolling(true);
+    const scrollContainer = scrollRef.current;
+    const distance = 300;
+    const duration = 500; // ms
+    const startTime = Date.now();
+    const startScrollLeft = scrollContainer.scrollLeft;
+    const targetScrollLeft = direction === 'left'
+      ? startScrollLeft - distance
+      : startScrollLeft + distance;
+
+    const animateScroll = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easeProgress = 1 - Math.pow(1 - progress, 3); // easing
+
+      let currentScrollLeft = startScrollLeft + (targetScrollLeft - startScrollLeft) * easeProgress;
+
+      if (posts.length > 1) {
+        const originalWidth = scrollContainer.scrollWidth / 2;
+        if (currentScrollLeft >= originalWidth) currentScrollLeft -= originalWidth;
+        if (currentScrollLeft < 0) currentScrollLeft += originalWidth;
+      }
+
+      scrollContainer.scrollLeft = currentScrollLeft;
+
+      if (progress < 1) {
+        requestAnimationFrame(animateScroll);
+      } else {
+        setIsManualScrolling(false);
+      }
+    };
+
+    requestAnimationFrame(animateScroll);
+  };
+
   return (
     <div className="w-full py-4">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-semibold text-primary">{t('home.latestNews')}</h2>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => scrollRef.current!.scrollLeft -= 300}>←</Button>
-          <Button variant="outline" size="sm" onClick={() => scrollRef.current!.scrollLeft += 300}>→</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleManualScroll('left')}
+          >
+            ←
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleManualScroll('right')}
+          >
+            →
+          </Button>
         </div>
       </div>
       <div 
@@ -172,10 +222,9 @@ export const NewsStrip = () => {
             {post.images && post.images.length > 0 && (
               <div className="relative h-32 w-full overflow-hidden">
                 <SensitiveImage 
-                  src={
-                    post.images[0].startsWith("http") 
-                      ? `${post.images[0]}?width=400&height=300&quality=70`
-                      : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${post.images[0]}?width=400&height=300&quality=70`
+                  src={post.images[0].startsWith("http") 
+                    ? post.images[0] 
+                    : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${post.images[0]}`
                   }
                   alt={post.title}
                   className="w-full h-full object-cover"
@@ -189,9 +238,26 @@ export const NewsStrip = () => {
                     {post.type === 'lost' ? t('status.lost') : post.type === 'adoption' ? 'En adopción' : t('status.reported')}
                   </Badge>
                 </div>
+                {post.species && (
+                  <div className="absolute top-2 right-2">
+                    <Badge variant="outline" className="bg-background/80">
+                      {t(`species.${post.species === 'dog' ? 'dogs' : post.species === 'cat' ? 'cats' : post.species === 'bird' ? 'birds' : post.species === 'rodent' ? 'rodents' : post.species}`)}
+                    </Badge>
+                  </div>
+                )}
               </div>
             )}
             <div className="p-3">
+              {(!post.images || post.images.length === 0) && (
+                <div className="flex items-start justify-between mb-2">
+                  <Badge variant={post.type === 'lost' ? 'destructive' : post.type === 'adoption' ? 'secondary' : 'default'}>
+                    {post.type === 'lost' ? t('status.lost') : post.type === 'adoption' ? 'En adopción' : t('status.reported')}
+                  </Badge>
+                  {post.species && (
+                    <Badge variant="outline">{t(`species.${post.species}`)}</Badge>
+                  )}
+                </div>
+              )}
               <h3 className="font-medium text-sm mb-2 line-clamp-2">{post.title}</h3>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <MapPin className="h-3 w-3" />
@@ -208,3 +274,4 @@ export const NewsStrip = () => {
     </div>
   );
 };
+

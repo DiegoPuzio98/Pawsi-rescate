@@ -59,7 +59,7 @@ export function SensitiveImage({
     alt.toLowerCase().includes("sick");
 
   if (!shouldBlur) {
-    return <img src={finalSrc} alt={alt} className={className} onError={onError} />;
+    return <img src={finalSrc} alt={alt} className={className} onError={onError} loading="lazy" />;
   }
 
   if (!revealed) {
@@ -89,11 +89,11 @@ export function SensitiveImage({
             </Button>
           )}
         </div>
-        <img src={finalSrc} alt={alt} className={`${className} blur-md`} onError={onError} />
+        <img src={finalSrc} alt={alt} className={`${className} blur-md`} onError={onError} loading="lazy" />
       </div>
     );
   }
 
-  return <img src={finalSrc} alt={alt} className={className} onError={onError} />;
+  return <img src={finalSrc} alt={alt} className={className} onError={onError} loading="lazy" />;
 }
 

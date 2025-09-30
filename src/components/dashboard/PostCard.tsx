@@ -25,6 +25,17 @@ export const PostCard: React.FC<{ post: Post }> = ({ post }) => {
           {post.description}
         </p>
 
+        {post.images && post.images.length > 0 && (
+          <div className="mt-2">
+            <img
+              src={post.images[0]}
+              alt={post.title}
+              className="rounded w-full max-h-48 object-cover"
+              loading="lazy"
+            />
+          </div>
+        )}
+
         <div className="mt-3 flex flex-wrap gap-3 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Eye className="h-4 w-4" />

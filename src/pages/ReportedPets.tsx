@@ -83,6 +83,11 @@ export default function ReportedPets() {
     setLocationFilter("");
   };
 
+  // 🔹 SCROLL TO TOP al montar
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (user) {
@@ -229,6 +234,7 @@ export default function ReportedPets() {
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = "none";
                     }}
+                    loading="lazy"
                   />
                   {post.state && (
                     <div className="absolute top-2 left-2">

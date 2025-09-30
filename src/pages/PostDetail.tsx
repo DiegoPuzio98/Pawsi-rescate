@@ -292,6 +292,7 @@ export default function PostDetail() {
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display = 'none';
                           }}
+                          loading="lazy"
                         />
                       </div>
                     </CarouselItem>

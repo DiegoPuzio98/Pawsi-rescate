@@ -51,6 +51,11 @@ export default function LostPets() {
     setLocationFilter("");
   };
 
+  // 🔹 SCROLL TO TOP al montar
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     const q = searchParams.get("q");
     const sp = searchParams.get("species");
@@ -186,3 +191,4 @@ export default function LostPets() {
     </div>
   );
 }
+

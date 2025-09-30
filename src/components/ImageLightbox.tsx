@@ -79,6 +79,7 @@ export function ImageLightbox({
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
+              loading="lazy"
             />
           </div>
 

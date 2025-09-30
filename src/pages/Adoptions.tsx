@@ -65,6 +65,11 @@ export default function Adoptions() {
     setLocationFilter("");
   };
 
+  // 🔹 SCROLL TO TOP al montar
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     const q = searchParams.get("q");
     const sp = searchParams.get("species");
@@ -184,6 +189,7 @@ export default function Adoptions() {
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = "none";
                     }}
+                    loading="lazy"
                   />
                 </div>
               )}
@@ -206,3 +212,4 @@ export default function Adoptions() {
     </div>
   );
 }
+
