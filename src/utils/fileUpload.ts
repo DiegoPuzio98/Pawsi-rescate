@@ -5,11 +5,14 @@ export const uploadFile = async (file: File): Promise<string> => {
   const baseName = `${Date.now()}-${Math.random().toString(36).substring(2)}`;
   const fileName = `${baseName}.${fileExt}`;
 
-  // Opciones de compresión
+  // 🔧 Opciones de compresión más optimizadas
   const originalOptions = {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1280,
+    maxSizeMB: 0.15,              
+    maxWidthOrHeight: 1280,       
     useWebWorker: true,
+    fileType: "image/webp",       
+    initialQuality: 0.7,          
+    alwaysKeepResolution: false,  
   };
 
   // Comprimir
@@ -18,11 +21,11 @@ export const uploadFile = async (file: File): Promise<string> => {
   // Subir a Cloudinary
   const formData = new FormData();
   formData.append("file", compressedFile, fileName);
-  formData.append("upload_preset", "Pawsi_posts"); // <-- preset
+  formData.append("upload_preset", "postspawsi"); // <-- preset
 
   const cloudName = "dxkjuhdqd"; // <-- cloud name
   const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+    `https://api.cloudinary.com/v1_1/dxkjuhdqd/image/upload`,
     { method: "POST", body: formData }
   );
 
