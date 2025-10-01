@@ -93,5 +93,18 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
     "vite": "^5.4.19"
-  }
+  },
+  "description": "**Pawsi** es una aplicación web integral desarrollada individualmente por Hugo Diego Puzio para el evento \"Hackathon del Milagro\", impulsado por la comunidad de SaltaDevs (10/09/2025), con el fin de brindar un amplio abanico de herramientas destinadas a la protección animal.   Permite reportar animales avistados, publicar alertas de mascotas perdidas, difundir adopciones, buscar alertas y posts, compartir información de veterinarias y productos para mascotas (alimento, ropa, accesorios, no permitido para la venta de animales). Además, cuenta con un sistema avanzado de filtros, canal de chat interno, geolocalización, estadisticas de cuenta en tiempo real,  términos y condiciones de uso, sistema antispam, formulario de soporte, perfil personalizado y sistema de guardado, entre otros.",
+  "main": "eslint.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DiegoPuzio98/Pawsi-android-version.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DiegoPuzio98/Pawsi-android-version/issues"
+  },
+  "homepage": "https://github.com/DiegoPuzio98/Pawsi-android-version#readme"
 }
