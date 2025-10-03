@@ -8,6 +8,7 @@ import { LocationSelector } from "@/components/LocationSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
+import { FileUpload } from "@/components/ui/file-upload";
 import { uploadFile } from "@/utils/fileUpload";
 import { User, Camera, Save, Trash2, MapPin } from "lucide-react";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
