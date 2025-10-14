@@ -6,9 +6,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { AdvancedSearch } from "@/components/AdvancedSearch";
-import { PostActions } from "@/components/PostActions";
-import { Badge } from "@/components/ui/badge";
-import { ContactInfoDialog } from "@/components/ContactInfoDialog";
 import { MapPin, Calendar, Plus } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
@@ -42,20 +39,8 @@ export default function Adoptions() {
   const [userProfile, setUserProfile] = useState<{ country?: string; province?: string } | null>(null);
   const [searchParams] = useSearchParams();
 
-  // 🔹 Paginación
   const pageSize = 10;
   const [page, setPage] = useState(0);
-
-  const speciesKeyForI18n = (s?: string | null) => {
-    switch (s) {
-      case "dog": return "dogs";
-      case "cat": return "cats";
-      case "bird": return "birds";
-      case "rodent": return "rodents";
-      case "fish": return "fish";
-      default: return s || "";
-    }
-  };
 
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -65,7 +50,6 @@ export default function Adoptions() {
     setLocationFilter("");
   };
 
-  // 🔹 SCROLL TO TOP al montar
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -140,6 +124,13 @@ export default function Adoptions() {
     setLoading(false);
   };
 
+  const getImageUrl = (img: string) => {
+    if (!img) return "";
+    if (img.startsWith("http")) return img;
+    // Cloudinary delivery URL (usa tu propio cloud name)
+    return `https://res.cloudinary.com/dy1um4pei/image/upload/w_400,h_300,c_fill,q_auto,f_webp/${img}.webp`;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -174,16 +165,12 @@ export default function Adoptions() {
             <Card
               key={post.id}
               className="overflow-hidden cursor-pointer hover:shadow-md transition"
-              onClick={() => (window.location.href = `/post/adoptions/${post.id}`)}
+              onClick={() => (window.location.href = `/post/adoption/${post.id}`)} // ← CORREGIDO (singular)
             >
               {post.images?.[0] && (
                 <div className="aspect-video bg-muted">
                   <img
-                    src={
-                      post.images[0].startsWith("http")
-                        ? post.images[0]
-                        : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${post.images[0]}?width=400&height=300&resize=cover`
-                    }
+                    src={getImageUrl(post.images[0])}
                     alt={post.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -212,4 +199,6 @@ export default function Adoptions() {
     </div>
   );
 }
+
+
 

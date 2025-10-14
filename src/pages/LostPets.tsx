@@ -133,6 +133,14 @@ export default function LostPets() {
     return daysLeft <= 7;
   };
 
+  // ✅ Nueva función para obtener la URL correcta
+  const getImageUrl = (img?: string) => {
+    if (!img) return "";
+    if (img.startsWith("http")) return img;
+    // Cloudinary public ID → genera versión optimizada webp
+    return `https://res.cloudinary.com/dy1um4pei/image/upload/w_400,h_300,c_fill,q_auto,f_webp/${img}.webp`;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -174,9 +182,13 @@ export default function LostPets() {
               {(post.thumbnail || post.images?.[0]) && (
                 <div className="aspect-video bg-muted">
                   <img
-                    src={post.thumbnail || post.images[0]}
+                    src={getImageUrl(post.thumbnail || post.images?.[0])}
                     alt={post.title}
                     className="w-full h-full object-cover"
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
                   />
                 </div>
               )}
@@ -191,4 +203,5 @@ export default function LostPets() {
     </div>
   );
 }
+
 

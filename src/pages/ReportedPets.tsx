@@ -180,6 +180,14 @@ export default function ReportedPets() {
     setLoading(false);
   };
 
+  // ✅ Genera URL desde public_id o URL completa
+  const getImageUrl = (img?: string) => {
+    if (!img) return "";
+    if (img.startsWith("http")) return img;
+    // 🔹 Genera versión optimizada desde Cloudinary public_id
+    return `https://res.cloudinary.com/dy1um4pei/image/upload/w_400,h_300,c_fill,q_auto,f_webp/${img}.webp`;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -223,11 +231,7 @@ export default function ReportedPets() {
               {post.images?.[0] && (
                 <div className="relative aspect-video bg-muted">
                   <SensitiveImage
-                    src={
-                      post.images[0].startsWith("http")
-                        ? post.images[0]
-                        : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${post.images[0]}?width=400&height=300&resize=cover`
-                    }
+                    src={getImageUrl(post.images[0])}
                     alt={post.title}
                     className="w-full h-full object-cover"
                     isSensitive={post.state === "injured" || post.state === "sick"}
@@ -324,5 +328,6 @@ export default function ReportedPets() {
     </div>
   );
 }
+
 
 

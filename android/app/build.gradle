@@ -7,8 +7,8 @@ android {
         applicationId "com.pawsi.app"
         minSdkVersion 24
         targetSdkVersion 35
-        versionCode 3
-        versionName "1.3"
+        versionCode 9
+        versionName "1.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
             // Archivos y dirs a ignorar en assets, para apps web modernas

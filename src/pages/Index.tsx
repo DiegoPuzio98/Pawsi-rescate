@@ -11,6 +11,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+// ✅ Importamos la nueva barra de patrocinadores
+import { TopSponsorsBar } from "@/components/TopSponsorsBar";
+
 const Index = () => {
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
@@ -28,8 +31,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Barra de navegación */}
       <Navigation />
-      
+
       <main className="container mx-auto px-4 py-6">
         {/* Hero Section */}
         <div className="text-center mb-8">
@@ -140,8 +144,12 @@ const Index = () => {
         {/* News Strip */}
         <NewsStrip />
       </main>
+
+      {/* ✅ Barra de patrocinadores al final de la página */}
+      <TopSponsorsBar />
     </div>
   );
 };
 
 export default Index;
+
