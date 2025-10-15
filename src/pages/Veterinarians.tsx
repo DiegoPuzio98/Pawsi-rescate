@@ -79,30 +79,39 @@ export default function Veterinarians() {
   };
 
   const handleRequestPublication = () => {
-    const subject = encodeURIComponent("Solicitud de Publicación - Veterinaria");
-    const body = encodeURIComponent(
-      `Hola, deseo solicitar la publicación de mi veterinaria en Pawsi.\n\n` +
-      `--- Por favor complete los siguientes datos ---\n\n` +
-      `Nombre de la Veterinaria:\n\n` +
-      `Dirección completa:\n\n` +
-      `Provincia:\n\n` +
-      `WhatsApp (nos comunicaremos con usted por este medio a la brevedad):\n\n` +
-      `Teléfono fijo (opcional):\n\n` +
-      `Email de contacto:\n\n` +
-      `Horarios de atención:\n\n` +
-      `Servicios que ofrece:\n\n` +
-      `Información adicional:\n\n` +
-      `---\n\n` +
-      `Luego de enviar una solicitud, esta será revisada por los administradores de Pawsi.
-      Nos comunicaremos con usted en el menor tiempo posible por los canales de contacto brindados para confirmar la 
-      publicación del establecimiento. Muchas gracias.`
-    );
-    
-    // Abre Gmail web directamente
-    window.open(
-      `https://mail.google.com/mail/?view=cm&fs=1&to=ecomervix@gmail.com&su=${subject}&body=${body}`,
-      '_blank'
-    );
+    const emailSubject = `Solicitud de Publicación - Veterinaria`;
+    const emailBody = `Hola, deseo solicitar la publicación de mi veterinaria en Pawsi.
+
+--- Por favor complete los siguientes datos ---
+
+Nombre de la Veterinaria:
+
+Dirección completa:
+
+Provincia:
+
+WhatsApp (nos comunicaremos con usted por este medio a la brevedad):
+
+Teléfono fijo (opcional):
+
+Email de contacto:
+
+Horarios de atención:
+
+Servicios que ofrece:
+
+Información adicional:
+
+---
+
+Luego de enviar esta solicitud, será revisada por los administradores de Pawsi.
+Nos comunicaremos con usted en el menor tiempo posible por los canales de contacto brindados para confirmar la publicación del establecimiento.
+
+Muchas gracias.`;
+
+    // Abre el cliente de email nativo
+    const mailtoLink = `mailto:ecomervix@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+    window.open(mailtoLink);
   };
 
   return (
