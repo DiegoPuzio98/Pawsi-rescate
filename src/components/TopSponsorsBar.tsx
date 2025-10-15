@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Sponsor {
@@ -9,8 +9,7 @@ interface Sponsor {
 
 export const TopSponsorsBar = () => {
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
-
-  console.log("✅ TopSponsorsBar montado");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSponsors = async () => {
@@ -19,66 +18,84 @@ export const TopSponsorsBar = () => {
         .select("*")
         .eq("active", true)
         .order("created_at", { ascending: true });
-
-      console.log("🎯 Datos recibidos desde Supabase:", data, error);
-
-      if (error) {
-        console.error("Error fetching sponsors:", error);
-      } else {
-        setSponsors(data || []);
-      }
+      if (error) console.error(error);
+      else setSponsors(data || []);
+      setLoading(false);
     };
-
     fetchSponsors();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="w-full bg-background border-t border-border py-6 text-center text-muted-foreground">
+        Cargando patrocinadores...
+      </div>
+    );
+  }
+
+  // Duplicamos muchas veces para asegurar que siempre haya contenido visible
+  const repeatedSponsors = Array(20).fill(sponsors).flat();
+
   return (
     <div className="w-full bg-background border-t border-border overflow-hidden py-6">
-      {/* Título estilizado */}
       <div
         className="flex justify-center py-3 text-xl font-bold text-brown tracking-wider drop-shadow-md"
-        style={{
-          fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-        }}
+        style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}
       >
         NOS APOYAN
       </div>
 
-      {/* Carrusel automático */}
-      <div className="overflow-hidden whitespace-nowrap">
+      <div className="relative overflow-hidden w-full">
         <div
-          className="inline-flex animate-scroll gap-8 px-4"
+          className="flex gap-10 w-max"
           style={{
-            animation: "scroll 30s linear infinite",
+            animation: 'scroll 60s linear infinite',
           }}
         >
-          {sponsors.length > 0
-            ? sponsors.concat(sponsors).map((sponsor, idx) => (
-                <img
-                  key={idx}
-                  src={sponsor.logo_url}
-                  alt={sponsor.name}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition"
-                  loading="lazy"
-                />
-              ))
-            : // Placeholder mientras cargan
-              <div className="h-12 w-full flex items-center justify-center text-muted-foreground opacity-50">
-                Cargando...
-              </div>}
+          {repeatedSponsors.map((sponsor, idx) => (
+            <img
+              key={`${sponsor.id}-${idx}`}
+              src={sponsor.logo_url}
+              alt={sponsor.name}
+              className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition flex-shrink-0"
+              loading="lazy"
+              draggable="false"
+            />
+          ))}
         </div>
       </div>
 
-      {/* Animación */}
-      <style>{`
+      <style dangerouslySetInnerHTML={{__html: `
         @keyframes scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
         }
-      `}</style>
+      `}} />
     </div>
   );
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

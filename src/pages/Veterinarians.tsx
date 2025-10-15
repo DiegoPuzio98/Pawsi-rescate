@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Navigation } from "@/components/navigation";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, MapPin, Calendar, Plus } from "lucide-react";
+import { Search, MapPin, Calendar, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,7 +31,6 @@ export default function Veterinarians() {
   const [page, setPage] = useState(0);
   const pageSize = 9;
 
-  // 🔹 SCROLL TO TOP al montar y al cambiar página
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [page]);
@@ -79,18 +78,43 @@ export default function Veterinarians() {
     setLoading(false);
   };
 
+  const handleRequestPublication = () => {
+    const subject = encodeURIComponent("Solicitud de Publicación - Veterinaria");
+    const body = encodeURIComponent(
+      `Hola, deseo solicitar la publicación de mi veterinaria en Pawsi.\n\n` +
+      `--- Por favor complete los siguientes datos ---\n\n` +
+      `Nombre de la Veterinaria:\n\n` +
+      `Dirección completa:\n\n` +
+      `Provincia:\n\n` +
+      `WhatsApp (nos comunicaremos con usted por este medio a la brevedad):\n\n` +
+      `Teléfono fijo (opcional):\n\n` +
+      `Email de contacto:\n\n` +
+      `Horarios de atención:\n\n` +
+      `Servicios que ofrece:\n\n` +
+      `Información adicional:\n\n` +
+      `---\n\n` +
+      `Luego de enviar una solicitud, esta será revisada por los administradores de Pawsi.
+      Nos comunicaremos con usted en el menor tiempo posible por los canales de contacto brindados para confirmar la 
+      publicación del establecimiento. Muchas gracias.`
+    );
+    
+    // Abre Gmail web directamente
+    window.open(
+      `https://mail.google.com/mail/?view=cm&fs=1&to=ecomervix@gmail.com&su=${subject}&body=${body}`,
+      '_blank'
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       <main className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-primary">{t("nav.veterinarians")}</h1>
-          <Link to="/veterinarians/new">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              {t("action.addVeterinarian")}
-            </Button>
-          </Link>
+          <Button onClick={handleRequestPublication}>
+            <Mail className="h-4 w-4 mr-2" />
+            Solicitar Publicación
+          </Button>
         </div>
 
         {/* Search */}
