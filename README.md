@@ -1,169 +1,176 @@
-# 🐾 Pawsi
+# Español
+Pawsi es mi proyecto más destacado: una aplicación móvil diseñada para ayudar a localizar y adoptar mascotas en Argentina. Fue desarrollada, diseñada y publicada por mí en Google Play, gestionando todo el ciclo: UI/UX, desarrollo, pruebas, despliegue y promoción. La app conecta a usuarios, mascotas perdidas y veterinarios, ofreciendo geolocalización, filtros por raza, género y estado de salud, y funciones de comunicación entre usuarios.
 
-**Pawsi** es una aplicación web integral desarrollada individualmente por Hugo Diego Puzio para el evento "Hackathon del Milagro",
-impulsado por la comunidad de SaltaDevs (10/09/2025), con el fin de brindar un amplio abanico de herramientas destinadas a la protección animal.  
-Permite reportar animales avistados, publicar alertas de mascotas perdidas, difundir adopciones, buscar alertas y posts,
-compartir información de veterinarias y productos para mascotas (alimento, ropa, accesorios, no permitido para la venta de animales).
-Además, cuenta con un sistema avanzado de filtros, canal de chat interno, geolocalización, estadisticas de cuenta en tiempo real, 
-términos y condiciones de uso, sistema antispam, formulario de soporte, perfil personalizado y sistema de guardado, entre otros.  
+# Tecnologías utilizadas
+Frontend / Mobile: React, Capacitor, TypeScript, Tailwind CSS
+Backend: Supabase (PostgreSQL), NextAuth
+Mapas y Geolocalización: Mapbox
+Email: Resend
+Autenticación y seguridad: NextAuth, Cloudflare Turnstile
+Almacenamiento de archivos: Cloudinary
 
-Su misión es **conectar personas, organizaciones y servicios** para ayudar a los animales de forma rápida, segura y responsable.
+# Herramientas de desarrollo:
+ VS Code, Android Studio, Git & GitHub
 
----
+# Funcionalidades principales
+Publicación y búsqueda de mascotas perdidas o en adopción
+Filtros por raza, color, género y estado de salud
+Geolocalización y navegación GPS
+Conexión entre usuarios y veterinarios
+Gestión de usuarios, notificaciones y administración de contenidos
 
-## 🚀 Demo
-👉 [Enlace a la demo](https://paw-circle-connect.lovable.app)  
+# Cómo ejecutar / construir el proyecto
+Cloná el repositorio:
+git clone https://github.com/tuusuario/pawsi-app.git
+cd pawsi-app
+Instalá dependencias:
 
----
-
-## 📲 Funcionalidades principales
-
-### 🔑 Registro y cuentas
-- Registro con email y contraseña.  
-- Confirmación por correo electrónico antes de acceder a la app.  
-- Perfil editable (nombre, país, provincia).  
-- Panel de estadísticas personales: publicaciones activas, resueltas y eliminadas.
-
-### 🐕 Formularios y secciones
-- **Animal avistado**: reportar animales en la calle, heridos, enfermos y/o perdidos.  
-- **Mascota perdida**: publicar alertas de extravío.  
-- **Compra y venta**: solo informativa (no cuenta con sistema de pagos) para productos y servicios (prohibida la venta de animales).  
-- **Veterinarias**: información sobre establecimientos y servicios.  
-- **Adopciones**: difundir animales disponibles para adopción.  
-
-🔸 Características:  
-- Campos obligatorios y opcionales.  
-- Subida de hasta 3 fotos.  
-- Integración con **Mapbox** para ubicación exacta.  
-- Teléfono/WhatsApp opcional con consentimiento expreso (se aclara que la información será pública en cada campo y se amplía en los
- Términos y Condiciones de Uso).  
-- Imágenes sensibles (heridos/enfermos) se difuminan y deben abrirse manualmente bajo consentimiento del usuario.  
-- En casos de reportar animales catalogados bajo el estado “sin vida”, la app desactiva automaticamente la opción de subir
- imágenes para proteger la sensibilidad del usuario y acoplarse a la política de seguridad de Google Playstore.
-
-### 📢 Noticias
-- Sección tipo “feed” con publicaciones en loop.  
-- Flechas para navegar rápidamente.
-
-### 💬 Contacto
-- Opciones de contacto público: WhatsApp, email, teléfono (opcionales para amoldarse a la política de protección de datos de Google Playstore).  
-- **Chat interno privado** (Canal disponible en "Mostrar métodos de contacto" de toda publicación bajo el nombre
-“Contactar vía Pawsi”) para usuarios que no deseen compartir datos personales. En todos los chats, el asunto es por defecto el nombre del post
-mediante el cual se contactó una de las partes, y los nombres de usuarios visibles son los registrados en el perfil.
-
-### 🛡️ Sistema de moderación, soporte y seguridad
-- Reporte de publicaciones y chats con causa + mensaje opcional (envío automático a `ecomervix@gmail.com`).  
-- Captcha numérico en formularios.  
-- Opción de bloquear y eliminar chats. 
-- Sistema de seguridad para imágenes sensibles. 
-- Sección de soporte con formulario de contacto.
-- Opción de eliminar cuenta.
-
-### 🔍 Filtros e idiomas
-- Filtros avanzados por país y provincia (todos los países latinoamericanos con subdivisiones).  
-- Filtros por color, raza, especie y ubicación en búsquedas de mascotas. 
-- Los resultados se actualizan en tiempo real dependiendo de los filtros. Los posts de distintas provincias son visibles únicamente para usuarios
-de la misma provincia (la cual se puede configurar en cualquier momento en el perfil). 
-
----
-
-## 🏗️ Arquitectura del proyecto
-├── public/ # Archivos públicos (svg, robots.txt)
-├── src/
-│ ├── components/ # Componentes de UI
-│ ├── contexts/ # Contextos globales
-│ ├── hooks/ # Custom hooks
-│ ├── integrations/ # Integraciones externas (Mapbox, Supabase, etc.)
-│ ├── lib/ # Librerías auxiliares
-│ ├── pages/ # Páginas principales
-│ ├── utils/ # Utilidades
-│ ├── App.tsx # Punto de entrada principal
-│ └── main.tsx # Bootstrap de React/Vite
-├── supabase/ # Funciones y migraciones
-├── package.json # Dependencias y scripts
-└── tailwind.config.ts # Configuración de TailwindCSS
-
-
----
-
-## 🛠️ Stack tecnológico
-
-- **Frontend:** [React](https://react.dev/) + [Vite](https://vitejs.dev/)  
-- **Lenguaje:** TypeScript  
-- **Estilos:** [TailwindCSS](https://tailwindcss.com/)  
-- **Backend & BaaS:** [Supabase](https://supabase.com/) (auth, storage, db, functions)  
-- **Mapas:** [Mapbox](https://www.mapbox.com/)  
-- **Infraestructura:** Despliegue con [Lovable](https://lovable.dev/)  
-
----
-
-## 🤖 IA usada en el desarrollo e integraciones
-
-El proyecto fue creado con la ayuda de **Lovable AI** para acelerar la construcción de la app, integraciones y despliegue.
-Cuenta con integraciones de Supabase, Cloudfare Turnstile, Mapbox y Resend.
-
-Variables de entorno:
-
-VITE_SUPABASE_URL=tu_url_supabase
-VITE_SUPABASE_ANON_KEY=tu_key
-VITE_MAPBOX_TOKEN=tu_token
-VITE_TURNSTILE_SITE_KEY=tu_site_key
-TURNSTILE_SECRET_KEY=tu_secret_key
-RESEND_API_KEY=tu_api_key
-
-Lengugajes utilizados:
-TypeScript
-94.5%
- 
-PLpgSQL
-4.3%
- 
-Other
-1.2%
-
-
----
-
-## ⚙️ Cómo correr el proyecto
-Opción 1) Acceder al link del demo provisto.
-
-Opción 2). Clonar el repositorio
-```bash
-git clone https://github.com/tu-usuario/pawsi.git
-cd pawsi
+bash
+Copiar código
 npm install
-Correr en local host: npm run dev
-Build de produccón: npm run build
+Crea un archivo .env basado en .env.example:
+
+bash
+Copiar código
+cp .env.example .env
+Rellena tus claves reales en .env.
+
+Ejecuta la app:
+
+bash
+Copiar código
+npm run dev
+o construí la app para producción:
+
+bash
+Copiar código
+npm run build
 npm run preview
 
 
-Licencia:
+# Rol y contribuciones:
+-Desarrollo full-stack y diseño de UI/UX
 
-Este proyecto está bajo la licencia Apache-2.0.
-Consulta el archivo LICENSE
- para más detalles.
+-Publicación en Google Play
 
-💡 Contribuciones
+-Entrevistas a usuarios, soporte y campaña de lanzamiento
 
-Las contribuciones son bienvenidas.
-Puedes abrir un issue o enviar un pull request.
-
-Agradecimientos
-
-Comunidad de Lovable AI por la herramienta de desarrollo asistido.
-
-Comunicad de SaltaDevs por impulsar el proyecto.
-
-Supabase por el backend serverless.
-
-Mapbox por la integración de mapas.
-
-Resend y Cloudflare Turnstile por las integraciones de seguridad y reenvío.
-
-Todas las personas comprometidas con el bienestar animal.
+-Integración con APIs y servicios externos (Supabase, Mapbox, Cloudinary, Resend)
 
 
-Cualquier duda, consulta, contribución o mensaje, comunicarse con ecomervix@gmail.com
+
+
+
+
+
+
+
+# English
+
+Pawsi is my most notable project: a mobile app designed to help locate and adopt pets across Argentina. I handled the entire lifecycle — design, development, testing, deployment, and promotion. The app connects users, lost pets, and veterinarians, offering geolocation, filters by breed, gender, health status, and user-to-user communication.
+
+# Technologies
+
+Frontend / Mobile: React, Capacitor, TypeScript, Tailwind CSS
+
+Backend: Supabase (PostgreSQL), NextAuth
+
+Maps & Geolocation: Mapbox
+
+Email: Resend
+
+Authentication & Security: NextAuth, Cloudflare Turnstile
+
+File Storage: Cloudinary
+
+# Development Tools:
+ VS Code, Android Studio, Git & GitHub
+
+# Main Features
+
+Publish and search for lost or adoptable pets
+
+Filters by breed, color, gender, and health status
+
+Geolocation and GPS navigation
+
+Connection between users and veterinarians
+
+User management, notifications, and content administration
+
+
+# How to Run / Build
+
+Clone the repository:
+
+git clone https://github.com/yourusername/pawsi-app.git
+cd pawsi-app
+
+
+Install dependencies:
+
+npm install
+
+
+Create a .env file based on .env.example:
+
+cp .env.example .env
+
+
+Fill in your real keys in .env.
+
+Run the app:
+
+npm run dev
+
+
+Or build for production:
+
+npm run build
+npm run preview
+
+# Role & Contributions
+
+-Full-stack development and UI/UX design
+
+-Google Play publication
+
+-User interviews, support, and launch campaign
+
+-Integration with external APIs and services (Supabase, Mapbox, Cloudinary, Resend)
+
+
+
+### **.env.example**
+
+```env
+# --- Supabase ---
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# --- Resend (emails) ---
+RESEND_API_KEY=your_resend_api_key
+
+# --- Mapbox ---
+VITE_MAPBOX_TOKEN=your_mapbox_token
+
+# --- Cloudflare Turnstile ---
+VITE_TURNSTILE_SITE_KEY=your_turnstile_site_key
+TURNSTILE_SECRET_KEY=your_turnstile_secret_key
+
+# --- NextAuth ---
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:5173
+
+# --- Cloudinary ---
+VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
+VITE_CLOUDINARY_UPLOAD_PRESET=your_upload_preset
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
+
+
 
 
 
