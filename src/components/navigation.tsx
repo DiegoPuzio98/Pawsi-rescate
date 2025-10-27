@@ -73,9 +73,7 @@ export const Navigation = () => {
   }
 
   const alias = "Pawsiapp";
-  const aliasValue = "$0"; // Poner el valor que corresponda
   const cbu = "0000003100049554063376";
-  const cbuValue = "$0"; // Poner el valor que corresponda
 
   return (
     <header className="sticky top-0 z-50 bg-background border-b shadow-sm">
@@ -99,15 +97,21 @@ export const Navigation = () => {
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
-                {/* Icono de las 3 barritas */}
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </Button>
             </SheetTrigger>
 
-            <SheetContent className="overflow-y-auto">
-              <div className="flex flex-col gap-4 mt-8 pb-20">
+            {/* ✅ Ajuste principal: el contenido usa flex-col con scroll opcional pero mostrando todo */}
+            <SheetContent className="flex flex-col justify-between h-full">
+              <div className="flex flex-col gap-4 mt-8">
                 {menuItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = location.pathname === item.path;
@@ -116,7 +120,11 @@ export const Navigation = () => {
                       key={item.path}
                       to={item.path}
                       onClick={() => setIsOpen(false)}
-                      className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isActive ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}
+                      className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                        isActive
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-accent"
+                      }`}
                     >
                       <Icon className="h-5 w-5" />
                       <span className="font-medium">{item.label}</span>
@@ -135,72 +143,83 @@ export const Navigation = () => {
                           key={item.path}
                           to={item.path}
                           onClick={() => setIsOpen(false)}
-                          className={`flex items-center justify-between gap-3 p-3 rounded-lg transition-colors ${isActive ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}
+                          className={`flex items-center justify-between gap-3 p-3 rounded-lg transition-colors ${
+                            isActive
+                              ? "bg-primary text-primary-foreground"
+                              : "hover:bg-accent"
+                          }`}
                         >
                           <div className="flex items-center gap-3">
                             <Icon className="h-5 w-5" />
                             <span className="font-medium">{item.label}</span>
                           </div>
                           {item.showBadge && unreadCount > 0 && (
-                            <Badge variant="destructive" className="ml-auto">{unreadCount}</Badge>
+                            <Badge variant="destructive" className="ml-auto">
+                              {unreadCount}
+                            </Badge>
                           )}
                         </Link>
                       );
                     })}
-
-                    {/* Panel de donación dentro del menú */}
-                    <button
-                      onClick={() => setShowDonatePanel(!showDonatePanel)}
-                      className="flex items-center justify-center gap-2 py-2 px-4 mt-2 bg-green-500 text-white font-medium rounded-full w-full hover:bg-green-600 transition"
-                    >
-                      <Heart className="h-5 w-5" />
-                      <span>Apoyanos</span>
-                    </button>
-
-                    {showDonatePanel && (
-                      <div className="bg-white rounded-xl p-4 shadow mt-2 border border-green-200 flex flex-col gap-2">
-                        {/* Alias */}
-                        <p className="mb-1 font-medium text-sm">
-                          Si querés apoyarnos, podés donar por transferencia:
-                        </p>
-                        <div className="flex items-center justify-between bg-gray-100 p-2 rounded">
-                          <span className="font-mono">{alias}</span>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(alias);
-                              alert("¡Alias copiado al portapapeles!");
-                            }}
-                            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition"
-                          >
-                            Copiar
-                          </button>
-                        </div>
-
-                        {/* CBU */}
-                        <p className="mb-1 font-medium text-sm">
-                          O también podés donar por <strong>CBU:</strong>
-                        </p>
-                        <div className="flex items-center justify-between bg-gray-100 p-2 rounded">
-                          <span className="font-mono">{cbu}</span>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(cbu);
-                              alert("¡CBU copiado al portapapeles!");
-                            }}
-                            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition"
-                          >
-                            Copiar
-                          </button>
-                        </div>
-
-                        <p className="text-sm text-gray-600">
-                          Cualquier aporte nos ayuda a seguir creciendo y mejorar Pawsi. ¡Muchas gracias por tu apoyo!
-                        </p>
-                      </div>
-                    )}
                   </>
                 )}
               </div>
+
+              {/* ✅ Muevo el botón de donación al final visible siempre */}
+              {isAuthenticated && (
+                <div className="mt-4 mb-4">
+                  <button
+                    onClick={() => setShowDonatePanel(!showDonatePanel)}
+                    className="flex items-center justify-center gap-2 py-2 px-4 bg-green-500 text-white font-medium rounded-full w-full hover:bg-green-600 transition"
+                  >
+                    <Heart className="h-5 w-5" />
+                    <span>Apoyanos</span>
+                  </button>
+
+                  {showDonatePanel && (
+                    <div className="bg-white rounded-xl p-4 shadow mt-2 border border-green-200 flex flex-col gap-2">
+                      <p className="mb-1 font-medium text-sm">
+                        Si querés apoyarnos, podés donar por transferencia:
+                      </p>
+
+                      <div className="flex items-center justify-between bg-gray-100 p-2 rounded">
+                        <span className="font-mono">{alias}</span>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(alias);
+                            alert("¡Alias copiado al portapapeles!");
+                          }}
+                          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition"
+                        >
+                          Copiar
+                        </button>
+                      </div>
+
+                      <p className="mb-1 font-medium text-sm">
+                        O también podés donar por <strong>CBU:</strong>
+                      </p>
+
+                      <div className="flex items-center justify-between bg-gray-100 p-2 rounded">
+                        <span className="font-mono">{cbu}</span>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(cbu);
+                            alert("¡CBU copiado al portapapeles!");
+                          }}
+                          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition"
+                        >
+                          Copiar
+                        </button>
+                      </div>
+
+                      <p className="text-sm text-gray-600">
+                        Cualquier aporte nos ayuda a seguir creciendo y mejorar
+                        Pawsi. ¡Muchas gracias por tu apoyo!
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </SheetContent>
           </Sheet>
         </div>
@@ -208,6 +227,7 @@ export const Navigation = () => {
     </header>
   );
 };
+
 
 
 

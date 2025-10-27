@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, Flag, MessageCircle } from "lucide-react";
+import { Heart, Flag, Share2 } from "lucide-react";
 import { ReportDialog } from "./ReportDialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { Share } from "@capacitor/share";
 
 interface PostActionsProps {
   postId: string;
@@ -30,6 +31,9 @@ export function PostActions({
   const [reportOpen, setReportOpen] = useState(false);
   const [highlightLoading, setHighlightLoading] = useState(false);
 
+  const baseUrl = import.meta.env.VITE_PUBLIC_SITE_URL || "https://www.pawsiapp.com";
+  const getPostUrl = () => `${baseUrl}/post/${postType}/${postId}`;
+
   const handleHighlight = async () => {
     if (!user) {
       toast({ title: "Inicia sesión", description: "Debes iniciar sesión para guardar publicaciones" });
@@ -39,7 +43,6 @@ export function PostActions({
     setHighlightLoading(true);
     try {
       if (isHighlighted) {
-        // Remove highlight
         const { error } = await supabase
           .from('user_highlights')
           .delete()
@@ -51,7 +54,6 @@ export function PostActions({
         onHighlightChange?.(false);
         toast({ title: "Publicación eliminada de guardados" });
       } else {
-        // Add highlight
         const { error } = await supabase
           .from('user_highlights')
           .insert({
@@ -79,14 +81,42 @@ export function PostActions({
       return;
     }
 
-    // Navigate to post detail page to see all contact options including Pawsi
     const currentPath = window.location.pathname;
     if (currentPath.includes('/post/')) {
-      // Already on post detail page - this shouldn't happen
       toast({ title: "Usa las opciones de contacto disponibles en la página" });
     } else {
-      // Navigate to post detail to see contact options
       window.location.href = `/post/${postType}/${postId}`;
+    }
+  };
+
+  const handleShare = async () => {
+    const url = getPostUrl();
+
+    // 🔹 Intentar usar Capacitor Share primero (móvil)
+    try {
+      await Share.share({
+        title: "Compartir publicación",
+        text: "Mirá esta publicación en Pawsi:",
+        url,
+        dialogTitle: "Compartir publicación"
+      });
+      return;
+    } catch (err) {
+      console.debug("Capacitor Share falló o estamos en web:", err);
+    }
+
+    // 🔹 Fallback: copiar enlace al portapapeles
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({
+        title: "Enlace copiado",
+        description: "Podés pegarlo en cualquier app",
+      });
+    } catch {
+      toast({
+        title: "Error",
+        description: "No se pudo copiar el enlace",
+      });
     }
   };
 
@@ -115,6 +145,15 @@ export function PostActions({
         Reportar
       </Button>
 
+      {/* Share button */}
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={handleShare}
+      >
+        <Share2 className="h-4 w-4" />
+      </Button>
+
       <ReportDialog
         open={reportOpen}
         onOpenChange={setReportOpen}
@@ -124,3 +163,5 @@ export function PostActions({
     </div>
   );
 }
+
+

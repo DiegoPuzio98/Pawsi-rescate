@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/hooks/useAuth";
 import { AuthGuard } from "@/components/AuthGuard";
@@ -34,9 +34,61 @@ import Terms from "./pages/Terms";
 import AdminPanel from "./pages/AdminPanel";
 import ResetPassword from "./pages/ResetPassword";
 import Footer from "./components/Footer";
+import AuthCallback from "./pages/AuthCallback";
 
 import { StatusBar, Style } from "@capacitor/status-bar";
+import { App as CapacitorApp } from "@capacitor/app";
 
+/* ------------------------------------------------------
+   🔗 DeepLinkHandler — escucha y maneja los deep links
+------------------------------------------------------ */
+const DeepLinkHandler = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleDeepLink = (url: string) => {
+      try {
+        console.log("🔗 Deep link recibido:", url);
+
+        const cleanedUrl = url
+          .replace(/^pawsi:\/\//, "")
+          .replace(/^https?:\/\/www\.pawsiapp\.com/, "");
+
+        if (cleanedUrl.startsWith("auth/callback")) {
+          navigate("/auth/callback");
+        } else if (cleanedUrl.startsWith("post/")) {
+          navigate(`/${cleanedUrl}`);
+        } else {
+          const path = cleanedUrl.startsWith("/") ? cleanedUrl : `/${cleanedUrl}`;
+          navigate(path || "/");
+        }
+      } catch (error) {
+        console.error("Error al procesar deep link:", error);
+      }
+    };
+
+    const checkInitialUrl = async () => {
+      const result = await CapacitorApp.getLaunchUrl();
+      if (result?.url) handleDeepLink(result.url);
+    };
+
+    const listener = CapacitorApp.addListener("appUrlOpen", (event) => {
+      if (event.url) handleDeepLink(event.url);
+    });
+
+    checkInitialUrl();
+
+    return () => {
+      listener.remove();
+    };
+  }, [navigate]);
+
+  return null;
+};
+
+/* ------------------------------------------------------
+   🌐 App principal
+------------------------------------------------------ */
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -44,6 +96,21 @@ const App = () => {
     StatusBar.setStyle({ style: Style.Dark });
     StatusBar.setBackgroundColor({ color: "#00000000" });
     StatusBar.setOverlaysWebView({ overlay: false });
+
+    // 🔹 Manejo del botón de retroceso en Android
+    const backButtonListener = CapacitorApp.addListener("backButton", () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        if (window.confirm("¿Estás seguro de que deseas salir de la aplicación?")) {
+          CapacitorApp.exitApp();
+        }
+      }
+    });
+
+    return () => {
+      backButtonListener.remove();
+    };
   }, []);
 
   return (
@@ -54,6 +121,8 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <DeepLinkHandler />
+
               <div className="min-h-screen flex flex-col">
                 <div className="flex-1">
                   <Routes>
@@ -66,7 +135,7 @@ const App = () => {
                         </AuthGuard>
                       }
                     />
-                    {/* ✅ Página pública para recuperar contraseña */}
+                    <Route path="/auth/callback" element={<AuthCallback />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
 
                     <Route
@@ -85,6 +154,7 @@ const App = () => {
                         </AuthGuard>
                       }
                     />
+
                     <Route path="/reported" element={<ReportedPets />} />
                     <Route
                       path="/reported/new"
@@ -130,6 +200,7 @@ const App = () => {
                         </AuthGuard>
                       }
                     />
+
                     <Route path="/support" element={<Support />} />
                     <Route
                       path="/saved"
@@ -156,6 +227,7 @@ const App = () => {
                         </AuthGuard>
                       }
                     />
+
                     <Route path="/post/:type/:id" element={<PostDetail />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>

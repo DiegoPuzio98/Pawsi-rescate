@@ -8,13 +8,15 @@ export const useNativeAuth = () => {
     try {
       setLoading(true);
 
+      // ✅ Redirige al dominio real
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
+        options: {
+          redirectTo: "https://www.pawsiapp.com/auth/callback",
+        },
       });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       return { data, error: null };
     } catch (error: any) {
@@ -28,9 +30,7 @@ export const useNativeAuth = () => {
   const signOutFromGoogle = async () => {
     try {
       const { error } = await supabase.auth.signOut();
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
     } catch (error) {
       console.error("Sign out error:", error);
     }
@@ -42,3 +42,8 @@ export const useNativeAuth = () => {
     loading,
   };
 };
+
+
+
+
+

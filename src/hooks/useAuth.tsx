@@ -7,7 +7,12 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isAuthenticated: boolean;
-  signUp: (email: string, password: string, displayName?: string, locationData?: { country?: string; province?: string }) => Promise<{ error: any }>;
+  signUp: (
+    email: string,
+    password: string,
+    displayName?: string,
+    locationData?: { country?: string; province?: string }
+  ) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ data: any; error: any }>;
   signOut: () => Promise<void>;
@@ -23,7 +28,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { signInWithGoogle: nativeSignInWithGoogle } = useNativeAuth();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
@@ -32,7 +36,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     );
 
-    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -42,9 +45,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, displayName?: string, locationData?: { country?: string; province?: string }) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
+  const signUp = async (
+    email: string,
+    password: string,
+    displayName?: string,
+    locationData?: { country?: string; province?: string }
+  ) => {
+    const redirectUrl = "https://www.pawsiapp.com/auth/callback";
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -53,9 +61,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         data: {
           display_name: displayName,
           country: locationData?.country,
-          province: locationData?.province
-        }
-      }
+          province: locationData?.province,
+        },
+      },
     });
     return { error };
   };
@@ -101,3 +109,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+

@@ -10,9 +10,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-// ✅ Importamos la nueva barra de patrocinadores
 import { TopSponsorsBar } from "@/components/TopSponsorsBar";
+import { DonateButton } from "@/components/DonateButton";
 
 const Index = () => {
   const { t } = useLanguage();
@@ -20,7 +19,8 @@ const Index = () => {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [category, setCategory] = useState("reported");
-  
+  const [donateOpen, setDonateOpen] = useState(false);
+
   const handleSearch = () => {
     if (!q) {
       navigate(`/${category}`);
@@ -35,6 +35,15 @@ const Index = () => {
       <Navigation />
 
       <main className="container mx-auto px-4 py-6">
+        {/* Mensaje visible si no hay sesión */}
+        {!isAuthenticated && (
+          <div className="mb-6 text-center text-gray-700 bg-yellow-100 border border-yellow-300 px-6 py-3 rounded-xl shadow-sm">
+            <p className="text-base font-medium">
+              Debes iniciar sesión para ver contenido.
+            </p>
+          </div>
+        )}
+
         {/* Hero Section */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
@@ -143,9 +152,19 @@ const Index = () => {
 
         {/* News Strip */}
         <NewsStrip />
+
+        {/* Botón de Donaciones debajo del NewsStrip */}
+        <div className="flex justify-center mt-6 mb-8">
+          <Button onClick={() => setDonateOpen(true)} className="px-6 py-2">
+            Colaborar con Pawsi 💚
+          </Button>
+        </div>
+
+        {/* Modal de Donaciones */}
+        <DonateButton open={donateOpen} onClose={() => setDonateOpen(false)} />
       </main>
 
-      {/* ✅ Barra de patrocinadores al final de la página */}
+      {/* Barra de patrocinadores */}
       <TopSponsorsBar />
     </div>
   );
