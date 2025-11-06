@@ -40,7 +40,8 @@ export default function MarketplaceNew() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
-  const [storeContact, setStoreContact] = useState("");
+  const [storeLink, setStoreLink] = useState("");
+  const [productLink, setProductLink] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -96,7 +97,8 @@ export default function MarketplaceNew() {
         location_lng: locationLng,
         contact_whatsapp: whatsapp || null,
         contact_email: email || null,
-        store_contact: storeContact || null,
+        store_link: storeLink || null,
+        product_link: productLink || null,
         status: "active",
         user_id: user?.id,
         country: country || null,
@@ -204,6 +206,16 @@ export default function MarketplaceNew() {
                 disabled={submitting}
               />
             </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Link del producto (opcional. Puede ser de redes sociales)</label>
+                <Input value={productLink} onChange={(e) => setProductLink(e.target.value)} placeholder="https://tutienda.com/producto" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Link de la tienda (opcional. Puede ser de redes sociales)</label>
+                <Input value={storeLink} onChange={(e) => setStoreLink(e.target.value)} placeholder="https://tutienda.com" />
+              </div>
+            </div>
             <div className="grid md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">WhatsApp (opcional)</label>
@@ -213,10 +225,6 @@ export default function MarketplaceNew() {
               <div>
                 <label className="block text-sm font-medium mb-1">Email (opcional)</label>
                 <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Contacto de tienda (opcional)</label>
-                <Input value={storeContact} onChange={(e) => setStoreContact(e.target.value)} placeholder="@mitienda" />
               </div>
             </div>
             <div className="flex gap-2">

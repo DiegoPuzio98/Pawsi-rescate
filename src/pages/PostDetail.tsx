@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom"; 
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { ArrowLeft, Calendar, MapPin, Flag } from "lucide-react";
+import { ArrowLeft, MapPin, Flag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MapboxPreview } from "@/components/MapboxPreview";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,7 +26,7 @@ interface PostData {
   breed?: string;
   age?: string;
   images?: string[];
-  location_text: string;
+  location_text?: string;
   location_lat?: number;
   location_lng?: number;
   created_at: string;
@@ -44,6 +44,11 @@ interface PostData {
   email?: string;
   website?: string;
   services?: string[];
+  // nuevos campos
+  product_link?: string | null;
+  store_link?: string | null;
+  province?: string;
+  country?: string;
 }
 
 interface ContactInfo {
@@ -72,9 +77,7 @@ export default function PostDetail() {
 
   const firstImageRef = useRef<HTMLDivElement | null>(null);
 
-  // -------------------------
-  // Manejo de back físico Android
-  // -------------------------
+  // Manejo de botón atrás en Android
   useEffect(() => {
     const handler = App.addListener("backButton", (event) => {
       event.stopImmediatePropagation();
@@ -90,9 +93,7 @@ export default function PostDetail() {
     return () => handler.remove();
   }, [navigate, location.state]);
 
-  // -------------------------
   // Fetch del post
-  // -------------------------
   useEffect(() => {
     const fetchPost = async () => {
       if (!type || !id) return;
@@ -107,7 +108,6 @@ export default function PostDetail() {
 
       try {
         let data, error;
-
         switch (type) {
           case "lost":
             ({ data, error } = await supabase.from("lost_posts").select("*").eq("id", id).eq("status", "active").single());
@@ -136,19 +136,16 @@ export default function PostDetail() {
         }
       } catch (error) {
         console.error("Error fetching post:", error);
-        toast({ title: "Error", description: "No se pudo cargar la información del post", variant: "destructive" });
+        toast({ title: "Error", description: "No se pudo cargar el post", variant: "destructive" });
         window.location.href = "/";
       } finally {
         setLoading(false);
       }
     };
-
     fetchPost();
   }, [type, id, navigate, toast]);
 
-  // -------------------------
   // Scroll a primera imagen si se abrió desde link externo
-  // -------------------------
   useEffect(() => {
     if (!loading && firstImageRef.current) {
       const fromExternal = !(location.state as any)?.from;
@@ -158,16 +155,13 @@ export default function PostDetail() {
     }
   }, [loading, location.state]);
 
-  // -------------------------
-  // Fetch info de contacto
-  // -------------------------
+  // Cargar información de contacto
   const loadContactInfo = async () => {
     if (!user) {
       toast({
-        title: "Autenticación requerida",
+        title: "Inicia sesión",
         description: "Debes iniciar sesión para ver la información de contacto.",
         variant: "destructive",
-        duration: 4000,
       });
       return;
     }
@@ -203,22 +197,22 @@ export default function PostDetail() {
 
   const getTypeLabel = () => {
     switch (type) {
-      case 'lost': return 'Perdido';
-      case 'reported': return 'Reportado';
-      case 'adoption': return 'Adopción';
-      case 'veterinarians': return 'Veterinaria';
-      case 'classifieds': return 'Clasificado';
+      case "lost": return "Perdido";
+      case "reported": return "Reportado";
+      case "adoption": return "Adopción";
+      case "veterinarians": return "Veterinaria";
+      case "classifieds": return "Clasificado";
       default: return type;
     }
   };
   const getTypeVariant = () => {
     switch (type) {
-      case 'lost': return 'destructive';
-      case 'reported': return 'default';
-      case 'adoption': return 'secondary';
-      case 'veterinarians': return 'default';
-      case 'classifieds': return 'outline';
-      default: return 'default';
+      case "lost": return "destructive";
+      case "reported": return "default";
+      case "adoption": return "secondary";
+      case "veterinarians": return "default";
+      case "classifieds": return "outline";
+      default: return "default";
     }
   };
 
@@ -229,11 +223,8 @@ export default function PostDetail() {
           variant="ghost"
           onClick={() => {
             const fromExternal = !(location.state as any)?.from;
-            if (fromExternal) {
-              window.location.href = "/";
-            } else {
-              navigate(location.state?.from || "/", { replace: true });
-            }
+            if (fromExternal) window.location.href = "/";
+            else navigate(location.state?.from || "/", { replace: true });
           }}
           className="mb-4"
         >
@@ -252,10 +243,10 @@ export default function PostDetail() {
                         onClick={() => { setLightboxIndex(index); setLightboxOpen(true); }}
                       >
                         <SensitiveImage
-                          src={image.startsWith('http') ? image : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${image}`}
+                          src={image.startsWith("http") ? image : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${image}`}
                           alt={`${post.title} - Imagen ${index + 1}`}
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
-                          isSensitive={type === 'reported' && (post.state === 'injured' || post.state === 'sick')}
+                          isSensitive={type === "reported" && (post.state === "injured" || post.state === "sick")}
                           loading="lazy"
                         />
                       </div>
@@ -277,31 +268,55 @@ export default function PostDetail() {
 
           <div className="p-6">
             <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              {post.species && (
-                <div>
-                  <p className="text-sm text-muted-foreground">Especie</p>
-                  <p className="font-medium">{t(`species.${post.species}`)}</p>
-                </div>
-              )}
-              {post.breed && (
-                <div>
-                  <p className="text-sm text-muted-foreground">Raza</p>
-                  <p className="font-medium">{post.breed}</p>
-                </div>
-              )}
-              {post.age && (
-                <div>
-                  <p className="text-sm text-muted-foreground">Edad</p>
-                  <p className="font-medium">{post.age}</p>
-                </div>
-              )}
-            </div>
+
+            {/* --- Clasificados: mostrar detalles --- */}
+            {type === "classifieds" && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                {post.condition && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Estado</p>
+                    <p className="font-medium">{post.condition}</p>
+                  </div>
+                )}
+                {post.price !== null && post.price !== undefined && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Precio</p>
+                    <p className="font-medium">${post.price}</p>
+                  </div>
+                )}
+                {post.location_text && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Área</p>
+                    <p className="font-medium">{post.location_text}</p>
+                  </div>
+                )}
+              </div>
+            )}
 
             {post.description && (
               <div className="mb-6">
                 <h2 className="text-lg font-semibold mb-2">Descripción</h2>
                 <p className="text-muted-foreground whitespace-pre-wrap">{post.description}</p>
+              </div>
+            )}
+
+            {/* --- Botones de tienda/producto --- */}
+            {(post.product_link || post.store_link) && (
+              <div className="flex flex-col md:flex-row gap-3 mb-6">
+                {post.product_link && (
+                  <Button asChild variant="default" className="w-full md:w-auto">
+                    <a href={post.product_link} target="_blank" rel="noopener noreferrer">
+                      Ver producto en tienda
+                    </a>
+                  </Button>
+                )}
+                {post.store_link && (
+                  <Button asChild variant="outline" className="w-full md:w-auto">
+                    <a href={post.store_link} target="_blank" rel="noopener noreferrer">
+                      Ir a tienda
+                    </a>
+                  </Button>
+                )}
               </div>
             )}
 
@@ -321,7 +336,7 @@ export default function PostDetail() {
             <Separator className="my-6" />
 
             <div className="flex flex-col gap-4">
-              <h2 className="text-lg font-semibold">Información de Contacto</h2>
+              <h2 className="text-lg font-semibold">Información de contacto</h2>
               <PostActions
                 postId={id!}
                 postType={type === "classifieds" ? "classified" : (type as any)}
@@ -329,11 +344,7 @@ export default function PostDetail() {
                 onHighlightChange={setIsHighlighted}
               />
               {!contactInfo ? (
-                <Button
-                  onClick={loadContactInfo}
-                  disabled={loadingContact}
-                  className="w-full"
-                >
+                <Button onClick={loadContactInfo} disabled={loadingContact} className="w-full">
                   {loadingContact ? "Cargando..." : "Mostrar información de contacto"}
                 </Button>
               ) : (
@@ -352,7 +363,7 @@ export default function PostDetail() {
 
         <div className="fixed bottom-6 right-6 z-50">
           <Button variant="destructive" onClick={() => setReportOpen(true)}>
-            <Flag className="h-4 w-4 mr-2" />Reportar publicación
+            <Flag className="h-4 w-4 mr-2" /> Reportar publicación
           </Button>
         </div>
 
@@ -377,6 +388,7 @@ export default function PostDetail() {
     </div>
   );
 }
+
 
 
 
