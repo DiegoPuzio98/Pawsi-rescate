@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,8 +8,8 @@ import { Navigation } from "@/components/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
-import { Search, Edit3, Trash2, Eye, Calendar, MapPin, Image as ImageIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Search, Edit3, Trash2, Eye, Calendar, MapPin } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 interface Post {
   id: string;
@@ -18,20 +18,21 @@ interface Post {
   status: string;
   created_at: string;
   location_text?: string;
-  thumbnail_url?: string; // 👈 agregado
+  thumbnail_url?: string;
   type: "adoption" | "lost" | "reported" | "classified";
 }
 
 export default function Dashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [page, setPage] = useState(0);
 
-  const limit = 10; // 👈 cantidad de posts por página
+  const limit = 10;
 
   useEffect(() => {
     if (user) {
@@ -56,13 +57,11 @@ export default function Dashboard() {
         ]);
 
       const allPosts: Post[] = [
-        ...(adoptionResult.data?.map((p) => ({ ...p, type: "adoption" as const })) || []),
-        ...(lostResult.data?.map((p) => ({ ...p, type: "lost" as const })) || []),
-        ...(reportedResult.data?.map((p) => ({ ...p, type: "reported" as const })) || []),
-        ...(classifiedResult.data?.map((p) => ({ ...p, type: "classified" as const })) || []),
-      ].sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
+        ...(adoptionResult.data?.map((p) => ({ ...p, type: "adoption" })) || []),
+        ...(lostResult.data?.map((p) => ({ ...p, type: "lost" })) || []),
+        ...(reportedResult.data?.map((p) => ({ ...p, type: "reported" })) || []),
+        ...(classifiedResult.data?.map((p) => ({ ...p, type: "classified" })) || []),
+      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
       setPosts(allPosts);
     } catch (error) {
@@ -79,15 +78,14 @@ export default function Dashboard() {
     try {
       let error;
 
-      if (postType === "adoption") {
+      if (postType === "adoption")
         ({ error } = await supabase.from("adoption_posts").delete().eq("id", postId));
-      } else if (postType === "lost") {
+      else if (postType === "lost")
         ({ error } = await supabase.from("lost_posts").delete().eq("id", postId));
-      } else if (postType === "reported") {
+      else if (postType === "reported")
         ({ error } = await supabase.from("reported_posts").delete().eq("id", postId));
-      } else if (postType === "classified") {
+      else if (postType === "classified")
         ({ error } = await supabase.from("classifieds").delete().eq("id", postId));
-      }
 
       if (error) throw error;
 
@@ -104,15 +102,14 @@ export default function Dashboard() {
       const newStatusAdjusted =
         postType === "reported" && newStatus === "resolved" ? "inactive" : newStatus;
 
-      if (postType === "adoption") {
+      if (postType === "adoption")
         ({ error } = await supabase.from("adoption_posts").update({ status: newStatusAdjusted }).eq("id", postId));
-      } else if (postType === "lost") {
+      else if (postType === "lost")
         ({ error } = await supabase.from("lost_posts").update({ status: newStatusAdjusted }).eq("id", postId));
-      } else if (postType === "reported") {
+      else if (postType === "reported")
         ({ error } = await supabase.from("reported_posts").update({ status: newStatusAdjusted }).eq("id", postId));
-      } else if (postType === "classified") {
+      else if (postType === "classified")
         ({ error } = await supabase.from("classifieds").update({ status: newStatusAdjusted }).eq("id", postId));
-      }
 
       if (error) throw error;
 
@@ -125,12 +122,14 @@ export default function Dashboard() {
 
   const filteredPosts = posts.filter((post) => {
     const matchesSearch =
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) || post.id.includes(searchTerm);
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.id.includes(searchTerm);
 
     if (activeTab === "resolved") {
       return (
         matchesSearch &&
-        (post.status === "resolved" || (post.type === "reported" && post.status === "inactive"))
+        (post.status === "resolved" ||
+          (post.type === "reported" && post.status === "inactive"))
       );
     } else if (activeTab === "all") {
       return matchesSearch && post.status !== "resolved" && post.status !== "inactive";
@@ -191,6 +190,7 @@ export default function Dashboard() {
       <Navigation />
 
       <main className="container mx-auto px-4 py-6">
+
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-primary">Mi Dashboard</h1>
           <Link to="/profile">
@@ -201,52 +201,7 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{posts.length}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Activas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                {posts.filter((p) => p.status === "active").length}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Resueltas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
-                {posts.filter((p) => p.status === "resolved" || (p.type === "reported" && p.status === "inactive")).length}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Este mes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {posts.filter((p) => new Date(p.created_at).getMonth() === new Date().getMonth()).length}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Search */}
+        {/* Buscar */}
         <div className="flex gap-4 mb-6">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -261,7 +216,7 @@ export default function Dashboard() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
+          <TabsList className="flex flex-wrap">
             <TabsTrigger value="all">Todas</TabsTrigger>
             <TabsTrigger value="adoption">Adopciones</TabsTrigger>
             <TabsTrigger value="lost">Perdidas</TabsTrigger>
@@ -270,108 +225,105 @@ export default function Dashboard() {
             <TabsTrigger value="resolved">Resueltas</TabsTrigger>
           </TabsList>
 
+          {/* LISTA DE POSTS */}
           <TabsContent value={activeTab} className="mt-6">
             <div className="space-y-4">
-              {filteredPosts.map((post) => (
-                <Card key={post.id}>
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-lg">{post.title}</h3>
-                          <Badge variant="outline">{getTypeLabel(post.type)}</Badge>
-                          <Badge className={getStatusColor(post.status)}>
-                            {post.status === "active"
-                              ? "Activa"
-                              : post.status === "resolved"
-                              ? "Resuelta"
-                              : "Inactiva"}
-                          </Badge>
-                        </div>
 
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Eye className="h-3 w-3" />
-                            <span>ID: {post.id.slice(0, 8)}</span>
+              {filteredPosts.map((post) => (
+                <Card key={post.id} className="w-full">
+
+                  {/* ✅ CARD CLICKEABLE */}
+                  <div
+                    className="cursor-pointer"
+                    onClick={() =>
+                      navigate(`/post/${post.type}/${post.id}`, {
+                        state: { from: "/dashboard" },
+                      })
+                    }
+                  >
+                    <CardContent className="p-4 flex flex-col gap-3">
+
+                      {/* HEADER */}
+                      <div className="flex justify-between items-start gap-3">
+
+                        {/* TITULO + INFO */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="font-semibold text-lg truncate">{post.title}</h3>
+                            <Badge variant="outline">{getTypeLabel(post.type)}</Badge>
+                            <Badge className={getStatusColor(post.status)}>
+                              {post.status === "active"
+                                ? "Activa"
+                                : post.status === "resolved"
+                                ? "Resuelta"
+                                : "Inactiva"}
+                            </Badge>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>{new Date(post.created_at).toLocaleDateString()}</span>
+
+                          <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Eye className="h-3 w-3" /> ID: {post.id.slice(0, 8)}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {new Date(post.created_at).toLocaleDateString()}
+                            </span>
+                            {post.location_text && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="h-3 w-3" /> {post.location_text}
+                              </span>
+                            )}
                           </div>
-                          {post.location_text && (
-                            <div className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              <span>{post.location_text}</span>
+
+                          {post.thumbnail_url && (
+                            <div className="mt-3">
+                              <img
+                                src={post.thumbnail_url}
+                                alt="Thumbnail"
+                                className="h-28 w-28 object-cover rounded"
+                              />
                             </div>
                           )}
                         </div>
-
-                        {/* Thumbnail */}
-                        {post.thumbnail_url && (
-                          <div className="mt-3">
-                            <img
-                              src={post.thumbnail_url}
-                              alt="Thumbnail"
-                              className="h-32 w-32 object-cover rounded"
-                            />
-                          </div>
-                        )}
                       </div>
+                    </CardContent>
+                  </div>
 
-                      {/* Actions */}
-                      <div className="flex gap-2">
-                        {activeTab === "resolved" ? (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => updatePostStatus(post.id, post.type, "active")}
-                            >
-                              Publicar de nuevo
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => deletePost(post.id, post.type)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </>
-                        ) : (
-                          <>
-                            {post.status === "active" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => updatePostStatus(post.id, post.type, "resolved")}
-                              >
-                                Marcar Resuelta
-                              </Button>
-                            )}
-                            {post.status === "resolved" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => updatePostStatus(post.id, post.type, "active")}
-                              >
-                                Reactivar
-                              </Button>
-                            )}
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => deletePost(post.id, post.type)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
+                  {/* ✅ ACCIONES (NO CLICKEAN LA CARD) */}
+                  <div className="px-4 pb-4 flex flex-wrap gap-2 justify-end">
+
+                    {post.status === "active" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => updatePostStatus(post.id, post.type, "resolved")}
+                      >
+                        Marcar Resuelta
+                      </Button>
+                    )}
+
+                    {post.status === "resolved" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => updatePostStatus(post.id, post.type, "active")}
+                      >
+                        Reactivar
+                      </Button>
+                    )}
+
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => deletePost(post.id, post.type)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </Card>
               ))}
 
+              {/* SIN POSTS */}
               {filteredPosts.length === 0 && (
                 <div className="text-center py-12">
                   <p className="text-muted-foreground">
@@ -379,24 +331,15 @@ export default function Dashboard() {
                       ? "No se encontraron publicaciones"
                       : "No tienes publicaciones aún"}
                   </p>
-                  {!searchTerm && (
-                    <div className="mt-4 space-x-2">
-                      <Link to="/adoptions/new">
-                        <Button>Publicar Adopción</Button>
-                      </Link>
-                      <Link to="/lost/new">
-                        <Button variant="outline">Reportar Perdida</Button>
-                      </Link>
-                    </div>
-                  )}
                 </div>
               )}
+
             </div>
           </TabsContent>
         </Tabs>
 
-        {/* Paginación */}
-        <div className="flex justify-center mt-6">
+        {/* PAGINACIÓN */}
+        <div className="flex justify-center mt-6 gap-2">
           <Button
             variant="outline"
             disabled={page === 0}
@@ -412,3 +355,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

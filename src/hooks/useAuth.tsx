@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     displayName?: string,
     locationData?: { country?: string; province?: string }
   ) => {
-    const redirectUrl = "https://www.pawsiapp.com/auth/callback";
+    const redirectUrl = "https://pawsiapp.com/auth/callback";
 
     const { error } = await supabase.auth.signUp({
       email,

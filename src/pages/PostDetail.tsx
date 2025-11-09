@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { ArrowLeft, MapPin, Flag } from "lucide-react";
+import { ArrowLeft, MapPin, Flag, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MapboxPreview } from "@/components/MapboxPreview";
 import { useAuth } from "@/hooks/useAuth";
@@ -44,7 +44,6 @@ interface PostData {
   email?: string;
   website?: string;
   services?: string[];
-  // nuevos campos
   product_link?: string | null;
   store_link?: string | null;
   province?: string;
@@ -77,7 +76,6 @@ export default function PostDetail() {
 
   const firstImageRef = useRef<HTMLDivElement | null>(null);
 
-  // Manejo de botón atrás en Android
   useEffect(() => {
     const handler = App.addListener("backButton", (event) => {
       event.stopImmediatePropagation();
@@ -93,7 +91,6 @@ export default function PostDetail() {
     return () => handler.remove();
   }, [navigate, location.state]);
 
-  // Fetch del post
   useEffect(() => {
     const fetchPost = async () => {
       if (!type || !id) return;
@@ -145,7 +142,6 @@ export default function PostDetail() {
     fetchPost();
   }, [type, id, navigate, toast]);
 
-  // Scroll a primera imagen si se abrió desde link externo
   useEffect(() => {
     if (!loading && firstImageRef.current) {
       const fromExternal = !(location.state as any)?.from;
@@ -155,7 +151,6 @@ export default function PostDetail() {
     }
   }, [loading, location.state]);
 
-  // Cargar información de contacto
   const loadContactInfo = async () => {
     if (!user) {
       toast({
@@ -216,20 +211,59 @@ export default function PostDetail() {
     }
   };
 
+  // ✅ DELETE REAL — Igual que en Dashboard
+  const deletePost = async () => {
+    if (!confirm("¿Seguro que quieres borrar el post?")) return;
+
+    try {
+      const table =
+        type === "classifieds"
+          ? "classifieds"
+          : type === "veterinarians"
+          ? "veterinarians"
+          : `${type}_posts`;
+
+      const { error } = await supabase
+        .from(table)
+        .delete()
+        .eq("id", post.id);
+
+      if (error) throw error;
+
+      alert("Post eliminado correctamente");
+      navigate(-1);
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo eliminar el post.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6 max-w-4xl">
-        <Button
-          variant="ghost"
-          onClick={() => {
-            const fromExternal = !(location.state as any)?.from;
-            if (fromExternal) window.location.href = "/";
-            else navigate(location.state?.from || "/", { replace: true });
-          }}
-          className="mb-4"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" /> Volver
-        </Button>
+
+        {/* ✅ VOLVER + BOTÓN ELIMINAR */}
+        <div className="relative mb-4">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const fromExternal = !(location.state as any)?.from;
+              if (fromExternal) window.location.href = "/";
+              else navigate(location.state?.from || "/", { replace: true });
+            }}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" /> Volver
+          </Button>
+
+          {user?.id === post.user_id && (
+            <button
+              onClick={deletePost}
+              className="absolute right-0 top-0 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow-md"
+            >
+              <Trash2 className="h-5 w-5" />
+            </button>
+          )}
+        </div>
 
         <Card className="overflow-hidden">
           {post.images && post.images.length > 0 && (
@@ -253,6 +287,7 @@ export default function PostDetail() {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
+
                 {post.images.length > 1 && (
                   <>
                     <CarouselPrevious className="absolute left-4 top-1/2" />
@@ -260,6 +295,7 @@ export default function PostDetail() {
                   </>
                 )}
               </Carousel>
+
               <div className="absolute top-4 left-4">
                 <Badge variant={getTypeVariant() as any}>{getTypeLabel()}</Badge>
               </div>
@@ -269,7 +305,6 @@ export default function PostDetail() {
           <div className="p-6">
             <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
 
-            {/* --- Clasificados: mostrar detalles --- */}
             {type === "classifieds" && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 {post.condition && (
@@ -300,7 +335,6 @@ export default function PostDetail() {
               </div>
             )}
 
-            {/* --- Botones de tienda/producto --- */}
             {(post.product_link || post.store_link) && (
               <div className="flex flex-col md:flex-row gap-3 mb-6">
                 {post.product_link && (
@@ -343,6 +377,7 @@ export default function PostDetail() {
                 isHighlighted={isHighlighted}
                 onHighlightChange={setIsHighlighted}
               />
+
               {!contactInfo ? (
                 <Button onClick={loadContactInfo} disabled={loadingContact} className="w-full">
                   {loadingContact ? "Cargando..." : "Mostrar información de contacto"}
@@ -388,6 +423,7 @@ export default function PostDetail() {
     </div>
   );
 }
+
 
 
 

@@ -1,7 +1,12 @@
 import imageCompression from "browser-image-compression";
 
 /**
- * Sube una sola imagen a Cloudinary, devuelve su URL pública y su public_id.
+ * Detectar si es iOS (Safari o app WebView)
+ */
+const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+/**
+ * Sube una sola imagen a Cloudinary, devuelve su URL optimizada y su public_id.
  */
 export const uploadFile = async (
   file: File
@@ -10,29 +15,42 @@ export const uploadFile = async (
   const baseName = `${Date.now()}-${Math.random().toString(36).substring(2)}`;
   const fileName = `${baseName}.${fileExt}`;
 
-  // 🔧 Configuración original de compresión (mantiene formato WEBP)
-  const originalOptions = {
-    maxSizeMB: 0.15,               // peso máximo ~150KB
-    maxWidthOrHeight: 1280,        // resolución máxima
+  // ✅ Opciones optimizadas según dispositivo
+  const optionsIOS = {
+    maxSizeMB: 0.20,
+    maxWidthOrHeight: 1280,   // ✅ antes 1600 → reduce mucho el peso
     useWebWorker: true,
-    fileType: "image/webp",        // siempre subir en formato webp
-    initialQuality: 0.7,
-    alwaysKeepResolution: false,
+    fileType: "image/jpeg",   // ✅ Safari lo maneja muchísimo mejor
+    initialQuality: 0.80,     // ✅ antes 0.85 → baja peso sin perder calidad visible
   };
 
-  // Comprimir imagen antes de subir
-  const compressedFile = await imageCompression(file, originalOptions);
+  const optionsAndroid = {
+    maxSizeMB: 0.15,
+    maxWidthOrHeight: 1280,
+    useWebWorker: true,
+    fileType: "image/webp",   // ✅ Android optimiza WebP perfecto
+    initialQuality: 0.7,
+  };
 
-  // Subir a Cloudinary
+  const selectedOptions = isIOS ? optionsIOS : optionsAndroid;
+
+  // ✅ Compresión según dispositivo
+  const compressedFile = await imageCompression(file, selectedOptions);
+
+  // ✅ Subir a Cloudinary
   const formData = new FormData();
   formData.append("file", compressedFile, fileName);
-  formData.append("upload_preset", "postspawsi"); // 🔹 tu preset configurado en Cloudinary
+  formData.append("upload_preset", "postspawsi");
 
-  const cloudName = "dxkjuhdqd"; // 🔹 tu Cloud Name de Cloudinary
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-    method: "POST",
-    body: formData,
-  });
+  const cloudName = "dxkjuhdqd";
+
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
 
   if (!res.ok) {
     const errorText = await res.text().catch(() => "");
@@ -41,17 +59,25 @@ export const uploadFile = async (
 
   const data = await res.json();
 
-  // ✅ Devolvemos la URL pública y el ID interno de Cloudinary
+  /**
+   * ✅ URL final optimizada:
+   *  - f_auto          → formato según dispositivo
+   *  - q_auto:low      → calidad automática baja (sin perder nitidez)
+   */
+  const optimizedUrl = data.secure_url.replace(
+    "/upload/",
+    "/upload/f_auto,q_auto:low/"
+  );
+
   return {
-    secure_url: data.secure_url,
+    secure_url: optimizedUrl,
     public_id: data.public_id,
   };
 };
 
 /**
- * Versión clásica (retrocompatible):
- * Sube múltiples imágenes y devuelve solo sus URLs.
- * 👉 No rompe el código que ya usa uploadFiles().
+ * Retrocompatible:
+ * Sube múltiples imágenes y devuelve solo sus URLs optimizadas.
  */
 export const uploadFiles = async (files: FileList): Promise<string[]> => {
   const results = await Promise.all(Array.from(files).map((f) => uploadFile(f)));
@@ -59,9 +85,7 @@ export const uploadFiles = async (files: FileList): Promise<string[]> => {
 };
 
 /**
- * Nueva versión extendida:
- * Sube múltiples imágenes y devuelve tanto URLs como public_ids.
- * 👉 Usala si querés guardar los public_ids en Supabase.
+ * Nueva versión que también devuelve public_ids.
  */
 export const uploadFilesWithIds = async (
   files: FileList

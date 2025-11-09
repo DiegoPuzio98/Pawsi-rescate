@@ -18,7 +18,7 @@ const translations = {
     'nav.veterinarians': 'Veterinarios',
     'nav.adoptions': 'Adopciones',
     'nav.support': 'Soporte',
-    'nav.dashboard': 'Datos de cuenta',
+    'nav.dashboard': 'Mis Posts',
     'nav.saved': 'Guardados',
     'nav.profile': 'Perfil',
     

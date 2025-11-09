@@ -31,7 +31,7 @@ export function PostActions({
   const [reportOpen, setReportOpen] = useState(false);
   const [highlightLoading, setHighlightLoading] = useState(false);
 
-  const baseUrl = import.meta.env.VITE_PUBLIC_SITE_URL || "https://www.pawsiapp.com";
+  const baseUrl = import.meta.env.VITE_PUBLIC_SITE_URL || "https://pawsiapp.com";
   const getPostUrl = () => `${baseUrl}/post/${postType}/${postId}`;
 
   const handleHighlight = async () => {
