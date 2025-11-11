@@ -39,6 +39,9 @@ import AuthCallback from "./pages/AuthCallback";
 import { StatusBar, Style } from "@capacitor/status-bar";
 import { App as CapacitorApp } from "@capacitor/app";
 
+// ✅ IMPORTAMOS LA NUEVA PÁGINA
+import DenunciasPage from "./pages/DenunciasPage";
+
 /* ------------------------------------------------------
    🔗 DeepLinkHandler — escucha y maneja los deep links
 ------------------------------------------------------ */
@@ -97,7 +100,6 @@ const App = () => {
     StatusBar.setBackgroundColor({ color: "#00000000" });
     StatusBar.setOverlaysWebView({ overlay: false });
 
-    // 🔹 Manejo del botón de retroceso en Android
     const backButtonListener = CapacitorApp.addListener("backButton", () => {
       if (window.history.length > 1) {
         window.history.back();
@@ -127,6 +129,10 @@ const App = () => {
                 <div className="flex-1">
                   <Routes>
                     <Route path="/" element={<Index />} />
+
+                    {/* ✅ NUEVA RUTA PARA DENUNCIAS */}
+                    <Route path="/denuncias" element={<DenunciasPage />} />
+
                     <Route
                       path="/auth"
                       element={
@@ -243,5 +249,6 @@ const App = () => {
 };
 
 export default App;
+
 
 

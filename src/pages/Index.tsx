@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Navigation } from "@/components/navigation";
 import { NewsStrip } from "@/components/news-strip";
-import { Camera, AlertTriangle, Heart, ShoppingCart, Stethoscope, Search } from "lucide-react";
+import { Camera, AlertTriangle, Heart, ShoppingCart, Stethoscope, Search, ShieldAlert } from "lucide-react";
 import { PawIcon } from "@/components/ui/paw-icon";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -24,7 +24,7 @@ const Index = () => {
   const [donateOpen, setDonateOpen] = useState(false);
   const [missingLocation, setMissingLocation] = useState(false);
 
-  // ✅ Detectar país/provincia faltantes desde la tabla profiles
+  // ✅ Detectar país/provincia faltantes desde profiles
   useEffect(() => {
     let mounted = true;
 
@@ -82,7 +82,7 @@ const Index = () => {
       <Navigation />
 
       <main className="container mx-auto px-4 py-6">
-        {/* ✅ ALERTA SI FALTA PAÍS O PROVINCIA */}
+        {/* ✅ ALERTA SI FALTA UBICACIÓN */}
         {missingLocation && (
           <div className="mb-6 bg-yellow-100 border border-yellow-300 px-6 py-3 rounded-xl shadow-sm">
             <p className="text-base font-medium text-center text-gray-800">
@@ -188,8 +188,9 @@ const Index = () => {
           </Link>
         </div>
 
-        {/* OTHER SERVICES */}
+        {/* ✅ OTHER SERVICES + NUEVO BOTÓN DENUNCIAS */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+
           <Link to="/adoptions">
             <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
               <Heart className="h-5 w-5" />
@@ -210,6 +211,15 @@ const Index = () => {
               <span className="text-sm">{t("nav.veterinarians")}</span>
             </Button>
           </Link>
+
+          {/* ✅ Nuevo botón — DENUNCIAS */}
+          <Link to="/denuncias">
+            <Button variant="outline" className="w-full h-16 flex flex-col gap-1 border-red-500 text-red-600">
+              <ShieldAlert className="h-5 w-5 text-red-600" />
+              <span className="text-sm">Denunciar Maltrato</span>
+            </Button>
+          </Link>
+
         </div>
 
         <NewsStrip />
@@ -230,4 +240,3 @@ const Index = () => {
 };
 
 export default Index;
-
